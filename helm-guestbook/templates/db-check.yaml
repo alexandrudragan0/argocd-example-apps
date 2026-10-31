@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-check-job
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    description: "Job to check database"
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migration
+        image: busybox
+        command: ["sh", "-c", "echo Checking database to $DB_HOST; sleep 5; echo Database check completed."]
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db_host
